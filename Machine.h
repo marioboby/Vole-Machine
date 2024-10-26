@@ -48,20 +48,25 @@ public:
 
 class Memory {
 public:
-    std::string memory[256];
+    string memory[256];
     int size = 256;
 
-    std::string getCell(int address) const;
+    Memory();
+
+    string getCell(int address) const;
     void setCell(int address, const std::string& value);
+    void clearMemory (int address);
+    void clear ();
 };
 
 class Register {
 public:
-    int memory[16];
+    int memory [16] = {0};
     int size = 16;
 
     int getCell(int index) const;
     void setCell(int index, int value);
+    void clearRegister (int address);
 };
 
 class CU {
