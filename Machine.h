@@ -1,8 +1,20 @@
+//
+// Created by mario saber on 10/24/2024.
+//
+
 #ifndef MACHINE_H
 #define MACHINE_H
 
 #include <string>
 #include <vector>
+#include <iostream>
+#include <sstream>
+#include <iomanip>
+#include  <fstream>
+#include <bitset>
+#include <cstdint>
+#include <cmath>
+using namespace std;
 
 class ALU;
 class CU;
@@ -12,16 +24,17 @@ class Register;
 class CPU {
 public:
     int programCounter;
-    std::string instructionRegister;
+    string instructionRegister;
     Register* registerSet;
     ALU* alu;
     CU* cu;
 
     CPU();
-    void runNextStep(Memory&);
-    void fetch(Memory&);
-    void decode();
-    void execute(Register&, Memory&, std::vector<int>&);
+    ~CPU();
+    void runNextStep(Memory*);
+    void fetch(Memory*);
+    vector<int> decode();
+    void execute(Register*, Memory*, vector<int>&);
 };
 
 class Machine {
@@ -30,20 +43,11 @@ public:
     Memory* memory;
 
     Machine();
+    ~Machine();
+    void displayMenu();
     void loadProgramFile();
     void outputState();
-};
-
-class MainUI {
-public:
-    Machine* machine;
-    bool enterFileOrInstructions;
-
-    void getFileOrInstructions();
-    void displayMenu();
-    void inputFileName();
-    void inputInstruction();
-    char inputChoice();
+    void outputSubState();
 };
 
 class Memory {
@@ -71,20 +75,31 @@ public:
 
 class CU {
 public:
-    void load(int idxReg, int intMem, Register& reg, Memory& mem);
-    void load(int idxReg, int valInt, Register& reg);
-    void store(int idxReg, int idxMem, Register& reg, Memory& mem);
-    void move(int idx1, int idx2, Register& reg);
-    void jump(int idxMem, int idxMem2, Register& reg, int PC);
-    void halt();
+    bool isRunning = true ;
+    void load(int idxReg, int intMem, Register* reg, Memory* mem);
+    void load(int idxReg, int valInt, Register* reg);
+    void store(int idxReg, int idxMem, Register* reg, Memory* mem);
+    void storeToScreen(int regIndex, Register* reg, Memory* mem, ALU* alu);
+    void move(int idx1, int idx2, Register* reg);
+    void jump(int regIndex, int targetAddress, Register* reg, int& programCounter);
+    void halt(CU* cu);
 };
 
 class ALU {
 public:
-    std::string hexToDec();
-    std::string decToHex();
-    bool isValid(const std::string& str);
-    void add(int idx1, int idx2, int idx3, Register& reg);
+    string hexToBinary(const string& hex);
+    float binaryToIEEE754(const string& binary);
+    string decimalToHexIEEE754(float decimal);
+    string hexToDec(string& hexStr);
+    string decToHex(int decimal);
+    bool isValid(const string& str);
+    void add(int idx1, int idx2, int idx3, Register* reg);
+    void addFloatingPoint(int destRegIndex, int regIndex1, int regIndex2, Register* reg);
+    void orop(int r, int s,int t, Register* reg);
+    void andop(int r, int s,int t, Register* reg);
+    void xorop(int r, int s,int t, Register* reg);
+    void rotateRight(int regIdx, int rotations, Register* reg, ALU* alu);
+    string bitsetToHex(const bitset<8>& bits);
 };
 
-#endif // MACHINE_H
+#endif //MACHINE_H
