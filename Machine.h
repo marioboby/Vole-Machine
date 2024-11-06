@@ -1,7 +1,3 @@
-//
-// Created by mario saber on 10/24/2024.
-//
-
 #ifndef MACHINE_H
 #define MACHINE_H
 
@@ -60,7 +56,7 @@ public:
     string getCell(int address) const;
     void setCell(int address, const std::string& value);
     void clearMemory (int address);
-    void clear ();
+    void clearAllMemory ();
 };
 
 class Register {
@@ -71,6 +67,7 @@ public:
     int getCell(int index) const;
     void setCell(int index, int value);
     void clearRegister (int address);
+    void clearAll();
 };
 
 class CU {
@@ -82,6 +79,7 @@ public:
     void storeToScreen(int regIndex, Register* reg, Memory* mem, ALU* alu);
     void move(int idx1, int idx2, Register* reg);
     void jump(int regIndex, int targetAddress, Register* reg, int& programCounter);
+    void jumpComplement(int regIndex, int targetAddress, Register* reg, int& programCounter);
     void halt(CU* cu);
 };
 
