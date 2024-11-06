@@ -81,6 +81,9 @@ void CPU::execute(Register* reg, Memory* mem, vector<int>& operands) {
         case 0xC: // Halt
             cu->halt(cu);
             break;
+        case 0xD: // Halt
+            cu->jumpComplement(operands[1], operands[2] * 16 + operands[3], reg, programCounter);
+            break;
         default:
             cerr << "Unknown opcode: " << opcode << endl;
     }
@@ -101,7 +104,9 @@ void Machine::displayMenu() {
     cout << "3. Display Current State\n";
     cout << "4. Run Full Program\n";
     cout << "5. Change PC\n";
-    cout << "6. Exit\n";
+    cout << "6. Clean Memories\n";
+    cout << "7. Clean Registers\n";
+    cout << "8. Exit\n";
     cout << "Choose an option: ";
 }
 
@@ -182,14 +187,12 @@ void Memory::setCell(int address, const string& value) {
 }
 
 void Memory::clearMemory(int address) {
-    if (address >= 0 && address < size) {
-        memory[address] = "00";
-    }
+    setCell(address,"00");
 }
 
-void Memory::clear() {
-    for (int i = 0; i < memory->size(); ++i) {
-        memory[i] = "00";
+void Memory::clearAllMemory() {
+    for (int i = 0; i < size; ++i) {
+        setCell(i,"00");
     };
 }
 
@@ -204,6 +207,12 @@ void Register::setCell(int index, int value) {
 
 void Register::clearRegister(int index) {
     memory[index] = 00;
+}
+
+void Register::clearAll() {
+    for (int i = 0; i < size; ++i) {
+        memory[i] = 0;
+    };
 }
 
 // CU Implementation
@@ -232,6 +241,14 @@ void CU::move(int idx1, int idx2, Register* reg) {
 void CU::jump(int regIndex, int targetAddress, Register* reg, int& programCounter) {
     if (reg->getCell(regIndex) == reg->getCell(0)) { // Compare R with register 0
         programCounter = targetAddress; // Set PC to XY if equal
+    }
+}
+
+void CU::jumpComplement(int regIndex, int targetAddress, Register* reg, int& programCounter) {
+    uint8_t x = reg->getCell(regIndex);
+    //cout << "x: " <<  (int)int8_t(x) << endl; ;
+    if ( int8_t(x) > reg->getCell(0)) { // Compare R with register 0
+        programCounter = targetAddress; // Set PC to XY if greater
     }
 }
 
